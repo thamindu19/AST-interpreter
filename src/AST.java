@@ -19,15 +19,15 @@ public class AST {
         this.root.standardize();
     }
 
-     private void preOrderTraverse(Node node, int i) {
-     for (int n = 0; n < i; n++) {
-     System.out.print(".");
-     }
-     System.out.println(node.getValue());
-     node.children.forEach((child) -> preOrderTraverse(child, i + 1));
-     }
+    private void preOrderTraverse(Node node, int i) {
+        for (int n = 0; n < i; n++) {
+            System.out.print(".");
+        }
+        System.out.println(node.getValue());
+        node.children.forEach((child) -> preOrderTraverse(child, i + 1));
+    }
 
-     public void printAst() {
-     this.preOrderTraverse(this.getRoot(), 0);
-     }
+    public void printAst() {
+        this.preOrderTraverse(this.getRoot(), 0);
+    }
 }

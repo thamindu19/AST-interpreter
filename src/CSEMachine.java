@@ -1,6 +1,8 @@
 
-import Symbols.*;
 import java.util.ArrayList;
+
+import nodes.*;
+import nodes.Node;
 
 public class CSEMachine {
     private ArrayList<Symbol> control;
