@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Delta extends Node {
     private int index;
-    public ArrayList<Node> Nodes;
+    public ArrayList<Node> nodes;
 
     public Delta(int i) {
         super("delta");
