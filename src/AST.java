@@ -1,3 +1,4 @@
+import nodes.Node;
 
 public class AST {
     private Node root;
