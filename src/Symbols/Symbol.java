@@ -1,7 +1,5 @@
 package Symbols;
 
-import java.util.ArrayList;
-
 public class Symbol {
     protected String value;
 
