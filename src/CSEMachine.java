@@ -25,7 +25,7 @@ public class CSEMachine {
         this.environment = environment;
     }
 
-    public void execute() {
+    public void run() {
         E currentEnvironment = this.environment.get(0);
         int j = 1;
         while (!control.isEmpty()) {
@@ -332,7 +332,7 @@ public class CSEMachine {
     }
 
     public String output() {
-        this.execute();
+        this.run();
         if (stack.get(0) instanceof Tup) {
             return this.getTupleValue((Tup) stack.get(0));
         }
