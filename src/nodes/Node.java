@@ -63,74 +63,75 @@ public class Node {
             for (Node child : this.children) {
                 child.standardize();
             }
+            Node X, X1, X2, E, E1, E2, P, N, F, lambda, gamma, comma, tau, ystar;
             switch (this.getValue()) {
                 case "let":
-                    Node temp1 = this.children.get(0).children.get(1);
-                    temp1.setParent(this);
-                    temp1.setDepth(this.depth + 1);
-                    Node temp2 = this.children.get(1);
-                    temp2.setParent(this.children.get(0));
-                    temp2.setDepth(this.depth + 2);
-                    this.children.set(1, temp1);
+                    E = this.children.get(0).children.get(1);
+                    E.setParent(this);
+                    E.setDepth(this.depth + 1);
+                    P = this.children.get(1);
+                    P.setParent(this.children.get(0));
+                    P.setDepth(this.depth + 2);
+                    this.children.set(1, E);
                     this.children.get(0).setValue("lambda");
-                    this.children.get(0).children.set(1, temp2);
+                    this.children.get(0).children.set(1, P);
                     this.setValue("gamma");
                     break;
                 case "where":
-                    Node temp = this.children.get(0);
+                    P = this.children.get(0);
                     this.children.set(0, this.children.get(1));
-                    this.children.set(1, temp);
+                    this.children.set(1, P);
                     this.setValue("let");
                     this.standardize();
                     break;
                 case "function_form":
-                    Node Ex = this.children.get(this.children.size() - 1);
-                    Node currentLambda = create("lambda", this.depth + 1, this, new ArrayList<Node>(), true);
-                    this.children.add(1, currentLambda);
-                    while (!this.children.get(2).equals(Ex)) {
+                    E = this.children.get(this.children.size() - 1);
+                    lambda = create("lambda", this.depth + 1, this, new ArrayList<Node>(), true);
+                    this.children.add(1, lambda);
+                    while (!this.children.get(2).equals(E)) {
                         Node V = this.children.get(2);
                         this.children.remove(2);
-                        V.setDepth(currentLambda.depth + 1);
-                        V.setParent(currentLambda);
-                        currentLambda.children.add(V);
+                        V.setDepth(lambda.depth + 1);
+                        V.setParent(lambda);
+                        lambda.children.add(V);
                         if (this.children.size() > 3) {
-                            currentLambda = create("lambda", currentLambda.depth + 1, currentLambda,
+                            lambda = create("lambda", lambda.depth + 1, lambda,
                                     new ArrayList<Node>(), true);
-                            currentLambda.getParent().children.add(currentLambda);
+                            lambda.getParent().children.add(lambda);
                         }
                     }
-                    currentLambda.children.add(Ex);
+                    lambda.children.add(E);
                     this.children.remove(2);
                     this.setValue("=");
                     break;
                 case "lambda":
                     if (this.children.size() > 2) {
-                        Node Ey = this.children.get(this.children.size() - 1);
-                        Node currentLambdax = create("lambda", this.depth + 1, this, new ArrayList<Node>(), true);
-                        this.children.add(1, currentLambdax);
-                        while (!this.children.get(2).equals(Ey)) {
+                        E = this.children.get(this.children.size() - 1);
+                        lambda = create("lambda", this.depth + 1, this, new ArrayList<Node>(), true);
+                        this.children.add(1, lambda);
+                        while (!this.children.get(2).equals(E)) {
                             Node V = this.children.get(2);
                             this.children.remove(2);
-                            V.setDepth(currentLambdax.depth + 1);
-                            V.setParent(currentLambdax);
-                            currentLambdax.children.add(V);
+                            V.setDepth(lambda.depth + 1);
+                            V.setParent(lambda);
+                            lambda.children.add(V);
                             if (this.children.size() > 3) {
-                                currentLambdax = create("lambda", currentLambdax.depth + 1, currentLambdax,
+                                lambda = create("lambda", lambda.depth + 1, lambda,
                                         new ArrayList<Node>(), true);
-                                currentLambdax.getParent().children.add(currentLambdax);
+                                lambda.getParent().children.add(lambda);
                             }
                         }
-                        currentLambdax.children.add(Ey);
+                        lambda.children.add(E);
                         this.children.remove(2);
                     }
                     break;
                 case "within":
-                    Node X1 = this.children.get(0).children.get(0);
-                    Node X2 = this.children.get(1).children.get(0);
-                    Node E1 = this.children.get(0).children.get(1);
-                    Node E2 = this.children.get(1).children.get(1);
-                    Node gamma = create("gamma", this.depth + 1, this, new ArrayList<Node>(), true);
-                    Node lambda = create("lambda", this.depth + 2, gamma, new ArrayList<Node>(), true);
+                    X1 = this.children.get(0).children.get(0);
+                    X2 = this.children.get(1).children.get(0);
+                    E1 = this.children.get(0).children.get(1);
+                    E2 = this.children.get(1).children.get(1);
+                    gamma = create("gamma", this.depth + 1, this, new ArrayList<Node>(), true);
+                    lambda = create("lambda", this.depth + 2, gamma, new ArrayList<Node>(), true);
                     X1.setDepth(X1.depth + 1);
                     X1.setParent(lambda);
                     X2.setDepth(X1.depth - 1);
@@ -149,23 +150,23 @@ public class Node {
                     this.setValue("=");
                     break;
                 case "@":
-                    Node gamma1 = create("gamma", this.depth + 1, this, new ArrayList<Node>(), true);
-                    Node e1 = this.children.get(0);
-                    e1.setDepth(e1.getDepth() + 1);
-                    e1.setParent(gamma1);
-                    Node n = this.children.get(1);
-                    n.setDepth(n.getDepth() + 1);
-                    n.setParent(gamma1);
-                    gamma1.children.add(n);
-                    gamma1.children.add(e1);
+                    gamma = create("gamma", this.depth + 1, this, new ArrayList<Node>(), true);
+                    E1 = this.children.get(0);
+                    E1.setDepth(E1.getDepth() + 1);
+                    E1.setParent(gamma);
+                    N = this.children.get(1);
+                    N.setDepth(N.getDepth() + 1);
+                    N.setParent(gamma);
+                    gamma.children.add(N);
+                    gamma.children.add(E1);
                     this.children.remove(0);
                     this.children.remove(0);
-                    this.children.add(0, gamma1);
+                    this.children.add(0, gamma);
                     this.setValue("gamma");
                     break;
                 case "and":
-                    Node comma = create(",", this.depth + 1, this, new ArrayList<Node>(), true);
-                    Node tau = create("tau", this.depth + 1, this, new ArrayList<Node>(), true);
+                    comma = create(",", this.depth + 1, this, new ArrayList<Node>(), true);
+                    tau = create("tau", this.depth + 1, this, new ArrayList<Node>(), true);
                     for (Node equal : this.children) {
                         equal.children.get(0).setParent(comma);
                         equal.children.get(1).setParent(tau);
@@ -178,23 +179,23 @@ public class Node {
                     this.setValue("=");
                     break;
                 case "rec":
-                    Node X = this.children.get(0).children.get(0);
-                    Node E = this.children.get(0).children.get(1);
-                    Node F = create(X.getValue(), this.depth + 1, this, X.children, true);
-                    Node G = create("gamma", this.depth + 1, this, new ArrayList<Node>(), true);
-                    Node Y = create("ystar", this.depth + 2, G, new ArrayList<Node>(), true);
-                    Node L = create("lambda", this.depth + 2, G, new ArrayList<Node>(), true);
-                    X.setDepth(L.depth + 1);
-                    X.setParent(L);
-                    E.setDepth(L.depth + 1);
-                    E.setParent(L);
-                    L.children.add(X);
-                    L.children.add(E);
-                    G.children.add(Y);
-                    G.children.add(L);
+                    X = this.children.get(0).children.get(0);
+                    E = this.children.get(0).children.get(1);
+                    F = create(X.getValue(), this.depth + 1, this, X.children, true);
+                    gamma = create("gamma", this.depth + 1, this, new ArrayList<Node>(), true);
+                    ystar = create("ystar", this.depth + 2, gamma, new ArrayList<Node>(), true);
+                    lambda = create("lambda", this.depth + 2, gamma, new ArrayList<Node>(), true);
+                    X.setDepth(lambda.depth + 1);
+                    X.setParent(lambda);
+                    E.setDepth(lambda.depth + 1);
+                    E.setParent(lambda);
+                    lambda.children.add(X);
+                    lambda.children.add(E);
+                    gamma.children.add(ystar);
+                    gamma.children.add(lambda);
                     this.children.clear();
                     this.children.add(F);
-                    this.children.add(G);
+                    this.children.add(gamma);
                     this.setValue("=");
                     break;
                 default:
