@@ -10,7 +10,7 @@ public class myrpal {
     public static void main(String[] args) throws FileNotFoundException {
 
         // Get input data
-//        String fileName = args[0];
+        // String fileName = args[0];
         String fileName = "ast.txt";
         Scanner scanner = new Scanner(new File(fileName));
         ArrayList<String> data = new ArrayList<String>();
@@ -48,12 +48,8 @@ public class myrpal {
             depth = d;
         }
 
-        // ast.printAst();
-
         // Standardize the AST
         ast.standardize();
-
-        // ast.printAst();
 
         // Build the CSE Machine
         CSEMachine machine = new CSEMachine(ast);

@@ -43,7 +43,6 @@ public class Node {
 
     public static Node create(String value, int depth) {
         Node node = new Node(value);
-        // node.setValue(value);
         node.setDepth(depth);
         node.children = new ArrayList<Node>();
         return node;
@@ -52,7 +51,6 @@ public class Node {
     public static Node create(String value, int depth, Node parent, ArrayList<Node> children,
             boolean standardized) {
         Node node = new Node(value);
-        // node.setValue(value);
         node.setDepth(depth);
         node.setParent(parent);
         node.children = children;

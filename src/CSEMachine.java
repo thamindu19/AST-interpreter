@@ -13,20 +13,15 @@ public class CSEMachine {
     private static int j = 0;
 
     public CSEMachine(AST ast) {
-        this.setControl(getControl(ast));
-        this.setStack(getStack());
-        this.setEnvironment(getEnvironment());
-    }
-
-    public void setControl(ArrayList<Node> control) {
+        ArrayList<Node> control = new ArrayList<Node>();
+        control.add(CSEMachine.e0);
+        control.add(this.getDelta(ast.getRoot()));
         this.control = control;
-    }
-
-    public void setStack(ArrayList<Node> stack) {
+        ArrayList<Node> stack = new ArrayList<Node>();
+        stack.add(CSEMachine.e0);
         this.stack = stack;
-    }
-
-    public void setEnvironment(ArrayList<E> environment) {
+        ArrayList<E> environment = new ArrayList<E>();
+        environment.add(CSEMachine.e0);
         this.environment = environment;
     }
 
@@ -228,24 +223,6 @@ public class CSEMachine {
         }
     }
 
-    public void printControl() {
-        System.out.print("Control: ");
-        for (Node Node : this.control) {
-            System.out.print(Node.getValue());
-            if (Node instanceof Lambda) {
-                System.out.print(((Lambda) Node).getIndex());
-            } else if (Node instanceof Delta) {
-                System.out.print(((Delta) Node).getIndex());
-            } else if (Node instanceof E) {
-                System.out.print(((E) Node).getIndex());
-            } else if (Node instanceof Eta) {
-                System.out.print(((Eta) Node).getIndex());
-            }
-            System.out.print(",");
-        }
-        System.out.println();
-    }
-
     public void printStack() {
         System.out.print("Stack: ");
         for (Node Node : this.stack) {
@@ -263,17 +240,6 @@ public class CSEMachine {
         }
         System.out.println();
     }
-
-    // public void printEnvironment() {
-    // for (Node Node: this.environment) {
-    // System.out.print("e"+((E) Node).getIndex()+ " --> ");
-    // if (((E) Node).getIndex()!=0) {
-    // System.out.println("e"+((E) Node).getParent().getIndex());
-    // } else {
-    // System.out.println();
-    // }
-    // }
-    // }
 
     public Node applyUnaryOperation(Node rator, Node rand) {
         if ("neg".equals(rator.getValue())) {
@@ -469,25 +435,6 @@ public class CSEMachine {
         Delta delta = new Delta(CSEMachine.j++);
         delta.Nodes = this.getPreOrderTraverse(node);
         return delta;
-    }
-
-    public ArrayList<Node> getControl(AST ast) {
-        ArrayList<Node> control = new ArrayList<Node>();
-        control.add(CSEMachine.e0);
-        control.add(this.getDelta(ast.getRoot()));
-        return control;
-    }
-
-    public ArrayList<Node> getStack() {
-        ArrayList<Node> stack = new ArrayList<Node>();
-        stack.add(CSEMachine.e0);
-        return stack;
-    }
-
-    public ArrayList<E> getEnvironment() {
-        ArrayList<E> environment = new ArrayList<E>();
-        environment.add(CSEMachine.e0);
-        return environment;
     }
 
 }
