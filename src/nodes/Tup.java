@@ -4,10 +4,10 @@ package nodes;
 import java.util.ArrayList;
 
 public class Tup extends Rand {
-    public ArrayList<Symbol> symbols;
+    public ArrayList<Node> Nodes;
 
     public Tup() {
         super("tup");
-        this.symbols = new ArrayList<Symbol>();
+        this.Nodes = new ArrayList<Node>();
     }
 }

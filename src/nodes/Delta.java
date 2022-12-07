@@ -1,22 +1,21 @@
 package nodes;
 
-
 import java.util.ArrayList;
 
-public class Delta extends Symbol {
+public class Delta extends Node {
     private int index;
-    public ArrayList<Symbol> symbols;
-    
+    public ArrayList<Node> Nodes;
+
     public Delta(int i) {
         super("delta");
         this.setIndex(i);
     }
-    
+
     private void setIndex(int i) {
         this.index = i;
     }
-    
+
     public int getIndex() {
         return this.index;
-    }    
+    }
 }

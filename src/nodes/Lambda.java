@@ -2,7 +2,7 @@ package nodes;
 
 import java.util.ArrayList;
 
-public class Lambda extends Symbol {
+public class Lambda extends Node {
     private int index;
     private int environment;
     public ArrayList<Id> identifiers;

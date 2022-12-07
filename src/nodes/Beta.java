@@ -1,7 +1,7 @@
 
 package nodes;
 
-public class Beta extends Symbol {
+public class Beta extends Node {
     public Beta() {
         super("beta");
     }

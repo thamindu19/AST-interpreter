@@ -1,6 +1,6 @@
 package nodes;
 
-public class Ystar extends Symbol {
+public class Ystar extends Node {
     public Ystar() {
         super("ystar");
     }

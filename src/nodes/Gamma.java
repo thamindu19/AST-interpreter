@@ -1,6 +1,6 @@
 package nodes;
 
-public class Gamma extends Symbol {
+public class Gamma extends Node {
     public Gamma() {
         super("gamma");
     }

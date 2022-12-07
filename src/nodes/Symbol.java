@@ -1,9 +1,9 @@
 package nodes;
 
-public class Symbol {
+public class Node {
     protected String value;
 
-    public Symbol(String value) {
+    public Node(String value) {
         this.value = value;
     }
 

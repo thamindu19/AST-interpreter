@@ -5,8 +5,8 @@ import nodes.*;
 import nodes.Node;
 
 public class CSEMachine {
-    private ArrayList<Symbol> control;
-    private ArrayList<Symbol> stack;
+    private ArrayList<Node> control;
+    private ArrayList<Node> stack;
     private ArrayList<E> environment;
     private static E e0 = new E(0);
     private static int i = 1;
@@ -18,11 +18,11 @@ public class CSEMachine {
         this.setEnvironment(getEnvironment());
     }
 
-    public void setControl(ArrayList<Symbol> control) {
+    public void setControl(ArrayList<Node> control) {
         this.control = control;
     }
 
-    public void setStack(ArrayList<Symbol> stack) {
+    public void setStack(ArrayList<Node> stack) {
         this.stack = stack;
     }
 
@@ -35,23 +35,23 @@ public class CSEMachine {
         int j = 1;
         while (!control.isEmpty()) {
             // pop last element of the control
-            Symbol currentSymbol = control.get(control.size() - 1);
+            Node currentNode = control.get(control.size() - 1);
             control.remove(control.size() - 1);
             // rule no. 1
-            if (currentSymbol instanceof Id) {
-                this.stack.add(0, currentEnvironment.lookup((Id) currentSymbol));
+            if (currentNode instanceof Id) {
+                this.stack.add(0, currentEnvironment.lookup((Id) currentNode));
                 // rule no. 2
-            } else if (currentSymbol instanceof Lambda) {
-                Lambda lambda = (Lambda) currentSymbol;
+            } else if (currentNode instanceof Lambda) {
+                Lambda lambda = (Lambda) currentNode;
                 lambda.setEnvironment(currentEnvironment.getIndex());
                 this.stack.add(0, lambda);
                 // rule no. 3, 4, 10, 11, 12 & 13
-            } else if (currentSymbol instanceof Gamma) {
-                Symbol nextSymbol = this.stack.get(0);
+            } else if (currentNode instanceof Gamma) {
+                Node nextNode = this.stack.get(0);
                 this.stack.remove(0);
                 // lambda (rule no. 4 & 11)
-                if (nextSymbol instanceof Lambda) {
-                    Lambda lambda = (Lambda) nextSymbol;
+                if (nextNode instanceof Lambda) {
+                    Lambda lambda = (Lambda) nextNode;
                     E e = new E(j++);
                     if (lambda.identifiers.size() == 1) {
                         e.values.put(lambda.identifiers.get(0), this.stack.get(0));
@@ -61,7 +61,7 @@ public class CSEMachine {
                         this.stack.remove(0);
                         int i = 0;
                         for (Id id : lambda.identifiers) {
-                            e.values.put(id, tup.symbols.get(i++));
+                            e.values.put(id, tup.Nodes.get(i++));
                         }
                     }
                     for (E environment : this.environment) {
@@ -75,13 +75,13 @@ public class CSEMachine {
                     this.stack.add(0, e);
                     this.environment.add(e);
                     // tup (rule no. 10)
-                } else if (nextSymbol instanceof Tup) {
-                    Tup tup = (Tup) nextSymbol;
+                } else if (nextNode instanceof Tup) {
+                    Tup tup = (Tup) nextNode;
                     int i = Integer.parseInt(this.stack.get(0).getValue());
                     this.stack.remove(0);
-                    this.stack.add(0, tup.symbols.get(i - 1));
+                    this.stack.add(0, tup.Nodes.get(i - 1));
                     // ystar (rule no. 12)
-                } else if (nextSymbol instanceof Ystar) {
+                } else if (nextNode instanceof Ystar) {
                     Lambda lambda = (Lambda) this.stack.get(0);
                     this.stack.remove(0);
                     Eta eta = new Eta();
@@ -91,8 +91,8 @@ public class CSEMachine {
                     eta.setLambda(lambda);
                     this.stack.add(0, eta);
                     // eta (rule no. 13)
-                } else if (nextSymbol instanceof Eta) {
-                    Eta eta = (Eta) nextSymbol;
+                } else if (nextNode instanceof Eta) {
+                    Eta eta = (Eta) nextNode;
                     Lambda lambda = eta.getLambda();
                     this.control.add(new Gamma());
                     this.control.add(new Gamma());
@@ -100,70 +100,70 @@ public class CSEMachine {
                     this.stack.add(0, lambda);
                     // builtin functions
                 } else {
-                    if ("Print".equals(nextSymbol.getValue())) {
+                    if ("Print".equals(nextNode.getValue())) {
                         // do nothing
-                    } else if ("Stem".equals(nextSymbol.getValue())) {
-                        Symbol s = this.stack.get(0);
+                    } else if ("Stem".equals(nextNode.getValue())) {
+                        Node s = this.stack.get(0);
                         this.stack.remove(0);
                         s.setValue(s.getValue().substring(0, 1));
                         this.stack.add(0, s);
-                    } else if ("Stern".equals(nextSymbol.getValue())) {
-                        Symbol s = this.stack.get(0);
+                    } else if ("Stern".equals(nextNode.getValue())) {
+                        Node s = this.stack.get(0);
                         this.stack.remove(0);
                         s.setValue(s.getValue().substring(1));
                         this.stack.add(0, s);
-                    } else if ("Conc".equals(nextSymbol.getValue())) {
-                        Symbol s1 = this.stack.get(0);
-                        Symbol s2 = this.stack.get(1);
+                    } else if ("Conc".equals(nextNode.getValue())) {
+                        Node s1 = this.stack.get(0);
+                        Node s2 = this.stack.get(1);
                         this.stack.remove(0);
                         this.stack.remove(0);
                         s1.setValue(s1.getValue() + s2.getValue());
                         this.stack.add(0, s1);
-                    } else if ("Order".equals(nextSymbol.getValue())) {
+                    } else if ("Order".equals(nextNode.getValue())) {
                         Tup tup = (Tup) this.stack.get(0);
                         this.stack.remove(0);
-                        Int n = new Int(Integer.toString(tup.symbols.size()));
+                        Int n = new Int(Integer.toString(tup.Nodes.size()));
                         this.stack.add(0, n);
-                    } else if ("Null".equals(nextSymbol.getValue())) {
+                    } else if ("Null".equals(nextNode.getValue())) {
                         // implement
-                    } else if ("Itos".equals(nextSymbol.getValue())) {
+                    } else if ("Itos".equals(nextNode.getValue())) {
                         // implement
-                    } else if ("Isinteger".equals(nextSymbol.getValue())) {
+                    } else if ("Isinteger".equals(nextNode.getValue())) {
                         if (this.stack.get(0) instanceof Int) {
                             this.stack.add(0, new Bool("true"));
                         } else {
                             this.stack.add(0, new Bool("false"));
                         }
                         this.stack.remove(1);
-                    } else if ("Isstring".equals(nextSymbol.getValue())) {
+                    } else if ("Isstring".equals(nextNode.getValue())) {
                         if (this.stack.get(0) instanceof Str) {
                             this.stack.add(0, new Bool("true"));
                         } else {
                             this.stack.add(0, new Bool("false"));
                         }
                         this.stack.remove(1);
-                    } else if ("Istuple".equals(nextSymbol.getValue())) {
+                    } else if ("Istuple".equals(nextNode.getValue())) {
                         if (this.stack.get(0) instanceof Tup) {
                             this.stack.add(0, new Bool("true"));
                         } else {
                             this.stack.add(0, new Bool("false"));
                         }
                         this.stack.remove(1);
-                    } else if ("Isdummy".equals(nextSymbol.getValue())) {
+                    } else if ("Isdummy".equals(nextNode.getValue())) {
                         if (this.stack.get(0) instanceof Dummy) {
                             this.stack.add(0, new Bool("true"));
                         } else {
                             this.stack.add(0, new Bool("false"));
                         }
                         this.stack.remove(1);
-                    } else if ("Istruthvalue".equals(nextSymbol.getValue())) {
+                    } else if ("Istruthvalue".equals(nextNode.getValue())) {
                         if (this.stack.get(0) instanceof Bool) {
                             this.stack.add(0, new Bool("true"));
                         } else {
                             this.stack.add(0, new Bool("false"));
                         }
                         this.stack.remove(1);
-                    } else if ("Isfunction".equals(nextSymbol.getValue())) {
+                    } else if ("Isfunction".equals(nextNode.getValue())) {
                         if (this.stack.get(0) instanceof Lambda) {
                             this.stack.add(0, new Bool("true"));
                         } else {
@@ -173,9 +173,9 @@ public class CSEMachine {
                     }
                 }
                 // rule no. 5
-            } else if (currentSymbol instanceof E) {
+            } else if (currentNode instanceof E) {
                 this.stack.remove(1);
-                this.environment.get(((E) currentSymbol).getIndex()).setIsRemoved(true);
+                this.environment.get(((E) currentNode).getIndex()).setIsRemoved(true);
                 int y = this.environment.size();
                 while (y > 0) {
                     if (!this.environment.get(y - 1).getIsRemoved()) {
@@ -186,23 +186,23 @@ public class CSEMachine {
                     }
                 }
                 // rule no. 6 & 7
-            } else if (currentSymbol instanceof Rator) {
-                if (currentSymbol instanceof Uop) {
-                    Symbol rator = currentSymbol;
-                    Symbol rand = this.stack.get(0);
+            } else if (currentNode instanceof Rator) {
+                if (currentNode instanceof Uop) {
+                    Node rator = currentNode;
+                    Node rand = this.stack.get(0);
                     this.stack.remove(0);
                     stack.add(0, this.applyUnaryOperation(rator, rand));
                 }
-                if (currentSymbol instanceof Bop) {
-                    Symbol rator = currentSymbol;
-                    Symbol rand1 = this.stack.get(0);
-                    Symbol rand2 = this.stack.get(1);
+                if (currentNode instanceof Bop) {
+                    Node rator = currentNode;
+                    Node rand1 = this.stack.get(0);
+                    Node rand2 = this.stack.get(1);
                     this.stack.remove(0);
                     this.stack.remove(0);
                     this.stack.add(0, this.applyBinaryOperation(rator, rand1, rand2));
                 }
                 // rule no. 8
-            } else if (currentSymbol instanceof Beta) {
+            } else if (currentNode instanceof Beta) {
                 if (Boolean.parseBoolean(this.stack.get(0).getValue())) {
                     this.control.remove(control.size() - 1);
                 } else {
@@ -210,36 +210,36 @@ public class CSEMachine {
                 }
                 this.stack.remove(0);
                 // rule no. 9
-            } else if (currentSymbol instanceof Tau) {
-                Tau tau = (Tau) currentSymbol;
+            } else if (currentNode instanceof Tau) {
+                Tau tau = (Tau) currentNode;
                 Tup tup = new Tup();
                 for (int i = 0; i < tau.getN(); i++) {
-                    tup.symbols.add(this.stack.get(0));
+                    tup.Nodes.add(this.stack.get(0));
                     this.stack.remove(0);
                 }
                 this.stack.add(0, tup);
-            } else if (currentSymbol instanceof Delta) {
-                this.control.addAll(((Delta) currentSymbol).symbols);
-            } else if (currentSymbol instanceof B) {
-                this.control.addAll(((B) currentSymbol).symbols);
+            } else if (currentNode instanceof Delta) {
+                this.control.addAll(((Delta) currentNode).Nodes);
+            } else if (currentNode instanceof B) {
+                this.control.addAll(((B) currentNode).Nodes);
             } else {
-                this.stack.add(0, currentSymbol);
+                this.stack.add(0, currentNode);
             }
         }
     }
 
     public void printControl() {
         System.out.print("Control: ");
-        for (Symbol symbol : this.control) {
-            System.out.print(symbol.getValue());
-            if (symbol instanceof Lambda) {
-                System.out.print(((Lambda) symbol).getIndex());
-            } else if (symbol instanceof Delta) {
-                System.out.print(((Delta) symbol).getIndex());
-            } else if (symbol instanceof E) {
-                System.out.print(((E) symbol).getIndex());
-            } else if (symbol instanceof Eta) {
-                System.out.print(((Eta) symbol).getIndex());
+        for (Node Node : this.control) {
+            System.out.print(Node.getValue());
+            if (Node instanceof Lambda) {
+                System.out.print(((Lambda) Node).getIndex());
+            } else if (Node instanceof Delta) {
+                System.out.print(((Delta) Node).getIndex());
+            } else if (Node instanceof E) {
+                System.out.print(((E) Node).getIndex());
+            } else if (Node instanceof Eta) {
+                System.out.print(((Eta) Node).getIndex());
             }
             System.out.print(",");
         }
@@ -248,16 +248,16 @@ public class CSEMachine {
 
     public void printStack() {
         System.out.print("Stack: ");
-        for (Symbol symbol : this.stack) {
-            System.out.print(symbol.getValue());
-            if (symbol instanceof Lambda) {
-                System.out.print(((Lambda) symbol).getIndex());
-            } else if (symbol instanceof Delta) {
-                System.out.print(((Delta) symbol).getIndex());
-            } else if (symbol instanceof E) {
-                System.out.print(((E) symbol).getIndex());
-            } else if (symbol instanceof Eta) {
-                System.out.print(((Eta) symbol).getIndex());
+        for (Node Node : this.stack) {
+            System.out.print(Node.getValue());
+            if (Node instanceof Lambda) {
+                System.out.print(((Lambda) Node).getIndex());
+            } else if (Node instanceof Delta) {
+                System.out.print(((Delta) Node).getIndex());
+            } else if (Node instanceof E) {
+                System.out.print(((E) Node).getIndex());
+            } else if (Node instanceof Eta) {
+                System.out.print(((Eta) Node).getIndex());
             }
             System.out.print(",");
         }
@@ -265,17 +265,17 @@ public class CSEMachine {
     }
 
     // public void printEnvironment() {
-    // for (Symbol symbol: this.environment) {
-    // System.out.print("e"+((E) symbol).getIndex()+ " --> ");
-    // if (((E) symbol).getIndex()!=0) {
-    // System.out.println("e"+((E) symbol).getParent().getIndex());
+    // for (Node Node: this.environment) {
+    // System.out.print("e"+((E) Node).getIndex()+ " --> ");
+    // if (((E) Node).getIndex()!=0) {
+    // System.out.println("e"+((E) Node).getParent().getIndex());
     // } else {
     // System.out.println();
     // }
     // }
     // }
 
-    public Symbol applyUnaryOperation(Symbol rator, Symbol rand) {
+    public Node applyUnaryOperation(Node rator, Node rand) {
         if ("neg".equals(rator.getValue())) {
             int val = Integer.parseInt(rand.getValue());
             return new Int(Integer.toString(-1 * val));
@@ -287,7 +287,7 @@ public class CSEMachine {
         }
     }
 
-    public Symbol applyBinaryOperation(Symbol rator, Symbol rand1, Symbol rand2) {
+    public Node applyBinaryOperation(Node rator, Node rand1, Node rand2) {
         if ("+".equals(rator.getValue())) {
             int val1 = Integer.parseInt(rand1.getValue());
             int val2 = Integer.parseInt(rand2.getValue());
@@ -342,9 +342,9 @@ public class CSEMachine {
             return new Bool(Boolean.toString(val1 >= val2));
         } else if ("aug".equals(rator.getValue())) {
             if (rand2 instanceof Tup) {
-                ((Tup) rand1).symbols.addAll(((Tup) rand2).symbols);
+                ((Tup) rand1).Nodes.addAll(((Tup) rand2).Nodes);
             } else {
-                ((Tup) rand1).symbols.add(rand2);
+                ((Tup) rand1).Nodes.add(rand2);
             }
             return rand1;
         } else {
@@ -354,11 +354,11 @@ public class CSEMachine {
 
     public String getTupleValue(Tup tup) {
         String temp = "(";
-        for (Symbol symbol : tup.symbols) {
-            if (symbol instanceof Tup) {
-                temp = temp + this.getTupleValue((Tup) symbol) + ", ";
+        for (Node Node : tup.Nodes) {
+            if (Node instanceof Tup) {
+                temp = temp + this.getTupleValue((Tup) Node) + ", ";
             } else {
-                temp = temp + symbol.getValue() + ", ";
+                temp = temp + Node.getValue() + ", ";
             }
         }
         temp = temp.substring(0, temp.length() - 2) + ")";
@@ -373,7 +373,7 @@ public class CSEMachine {
         return stack.get(0).getValue();
     }
 
-    public Symbol getSymbol(Node node) {
+    public Node getNode(Node node) {
         switch (node.getValue()) {
             // unary operators
             case "not":
@@ -429,7 +429,7 @@ public class CSEMachine {
 
     public B getB(Node node) {
         B b = new B();
-        b.symbols = this.getPreOrderTraverse(node);
+        b.Nodes = this.getPreOrderTraverse(node);
         return b;
     }
 
@@ -447,39 +447,39 @@ public class CSEMachine {
         return lambda;
     }
 
-    private ArrayList<Symbol> getPreOrderTraverse(Node node) {
-        ArrayList<Symbol> symbols = new ArrayList<Symbol>();
+    private ArrayList<Node> getPreOrderTraverse(Node node) {
+        ArrayList<Node> Nodes = new ArrayList<Node>();
         if ("lambda".equals(node.getValue())) {
-            symbols.add(this.getLambda(node));
+            Nodes.add(this.getLambda(node));
         } else if ("->".equals(node.getValue())) {
-            symbols.add(this.getDelta(node.children.get(1)));
-            symbols.add(this.getDelta(node.children.get(2)));
-            symbols.add(new Beta());
-            symbols.add(this.getB(node.children.get(0)));
+            Nodes.add(this.getDelta(node.children.get(1)));
+            Nodes.add(this.getDelta(node.children.get(2)));
+            Nodes.add(new Beta());
+            Nodes.add(this.getB(node.children.get(0)));
         } else {
-            symbols.add(this.getSymbol(node));
+            Nodes.add(this.getNode(node));
             for (Node child : node.children) {
-                symbols.addAll(this.getPreOrderTraverse(child));
+                Nodes.addAll(this.getPreOrderTraverse(child));
             }
         }
-        return symbols;
+        return Nodes;
     }
 
     public Delta getDelta(Node node) {
         Delta delta = new Delta(CSEMachine.j++);
-        delta.symbols = this.getPreOrderTraverse(node);
+        delta.Nodes = this.getPreOrderTraverse(node);
         return delta;
     }
 
-    public ArrayList<Symbol> getControl(AST ast) {
-        ArrayList<Symbol> control = new ArrayList<Symbol>();
+    public ArrayList<Node> getControl(AST ast) {
+        ArrayList<Node> control = new ArrayList<Node>();
         control.add(CSEMachine.e0);
         control.add(this.getDelta(ast.getRoot()));
         return control;
     }
 
-    public ArrayList<Symbol> getStack() {
-        ArrayList<Symbol> stack = new ArrayList<Symbol>();
+    public ArrayList<Node> getStack() {
+        ArrayList<Node> stack = new ArrayList<Node>();
         stack.add(CSEMachine.e0);
         return stack;
     }
