@@ -223,24 +223,6 @@ public class CSEMachine {
         }
     }
 
-    public void printStack() {
-        System.out.print("Stack: ");
-        for (Node Node : this.stack) {
-            System.out.print(Node.getValue());
-            if (Node instanceof Lambda) {
-                System.out.print(((Lambda) Node).getIndex());
-            } else if (Node instanceof Delta) {
-                System.out.print(((Delta) Node).getIndex());
-            } else if (Node instanceof E) {
-                System.out.print(((E) Node).getIndex());
-            } else if (Node instanceof Eta) {
-                System.out.print(((Eta) Node).getIndex());
-            }
-            System.out.print(",");
-        }
-        System.out.println();
-    }
-
     public Node applyUnaryOperation(Node rator, Node rand) {
         if ("neg".equals(rator.getValue())) {
             int val = Integer.parseInt(rand.getValue());
