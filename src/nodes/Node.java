@@ -64,7 +64,6 @@ public class Node {
                 child.standardize();
             }
             switch (this.getValue()) {
-                // standardizing let
                 case "let":
                     Node temp1 = this.children.get(0).children.get(1);
                     temp1.setParent(this);
@@ -77,7 +76,6 @@ public class Node {
                     this.children.get(0).children.set(1, temp2);
                     this.setValue("gamma");
                     break;
-                // standardizing where
                 case "where":
                     Node temp = this.children.get(0);
                     this.children.set(0, this.children.get(1));
@@ -85,7 +83,6 @@ public class Node {
                     this.setValue("let");
                     this.standardize();
                     break;
-                // standardizing function_form
                 case "function_form":
                     Node Ex = this.children.get(this.children.size() - 1);
                     Node currentLambda = create("lambda", this.depth + 1, this, new ArrayList<Node>(), true);
@@ -106,7 +103,6 @@ public class Node {
                     this.children.remove(2);
                     this.setValue("=");
                     break;
-                // standardizing lambda (multi parameter functions)
                 case "lambda":
                     if (this.children.size() > 2) {
                         Node Ey = this.children.get(this.children.size() - 1);
@@ -128,7 +124,6 @@ public class Node {
                         this.children.remove(2);
                     }
                     break;
-                // standardizing within
                 case "within":
                     Node X1 = this.children.get(0).children.get(0);
                     Node X2 = this.children.get(1).children.get(0);
@@ -153,7 +148,6 @@ public class Node {
                     this.children.add(gamma);
                     this.setValue("=");
                     break;
-                // standardizing @
                 case "@":
                     Node gamma1 = create("gamma", this.depth + 1, this, new ArrayList<Node>(), true);
                     Node e1 = this.children.get(0);
@@ -169,7 +163,6 @@ public class Node {
                     this.children.add(0, gamma1);
                     this.setValue("gamma");
                     break;
-                // standardizing and (simultaneous definitions)
                 case "and":
                     Node comma = create(",", this.depth + 1, this, new ArrayList<Node>(), true);
                     Node tau = create("tau", this.depth + 1, this, new ArrayList<Node>(), true);
@@ -184,7 +177,6 @@ public class Node {
                     this.children.add(tau);
                     this.setValue("=");
                     break;
-                // standardizing rec
                 case "rec":
                     Node X = this.children.get(0).children.get(0);
                     Node E = this.children.get(0).children.get(1);
@@ -205,8 +197,6 @@ public class Node {
                     this.children.add(G);
                     this.setValue("=");
                     break;
-                // unary & binary operators, tuples, conditionals and commas are not
-                // standardized due cse rules 6-13
                 default:
                     break;
             }
