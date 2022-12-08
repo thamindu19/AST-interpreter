@@ -52,11 +52,11 @@ public class CSEMachine {
                         e.values.put(lambda.identifiers.get(0), this.stack.get(0));
                         this.stack.remove(0);
                     } else {
-                        Tup tup = (Tup) this.stack.get(0);
+                        Tuple tuple = (Tuple) this.stack.get(0);
                         this.stack.remove(0);
                         int i = 0;
                         for (Id id : lambda.identifiers) {
-                            e.values.put(id, tup.nodes.get(i++));
+                            e.values.put(id, tuple.nodes.get(i++));
                         }
                     }
                     for (Environment env : this.env) {
@@ -70,11 +70,11 @@ public class CSEMachine {
                     this.stack.add(0, e);
                     this.env.add(e);
                     // tup (rule no. 10)
-                } else if (nextNode instanceof Tup) {
-                    Tup tup = (Tup) nextNode;
+                } else if (nextNode instanceof Tuple) {
+                    Tuple tuple = (Tuple) nextNode;
                     int i = Integer.parseInt(this.stack.get(0).getValue());
                     this.stack.remove(0);
-                    this.stack.add(0, tup.nodes.get(i - 1));
+                    this.stack.add(0, tuple.nodes.get(i - 1));
                     // ystar (rule no. 12)
                 } else if (nextNode instanceof Ystar) {
                     Lambda lambda = (Lambda) this.stack.get(0);
@@ -115,9 +115,9 @@ public class CSEMachine {
                         s1.setValue(s1.getValue() + s2.getValue());
                         this.stack.add(0, s1);
                     } else if ("Order".equals(nextNode.getValue())) {
-                        Tup tup = (Tup) this.stack.get(0);
+                        Tuple tuple = (Tuple) this.stack.get(0);
                         this.stack.remove(0);
-                        Int n = new Int(Integer.toString(tup.nodes.size()));
+                        Int n = new Int(Integer.toString(tuple.nodes.size()));
                         this.stack.add(0, n);
                     } else if ("Null".equals(nextNode.getValue())) {
                         // implement
@@ -138,7 +138,7 @@ public class CSEMachine {
                         }
                         this.stack.remove(1);
                     } else if ("Istuple".equals(nextNode.getValue())) {
-                        if (this.stack.get(0) instanceof Tup) {
+                        if (this.stack.get(0) instanceof Tuple) {
                             this.stack.add(0, new Bool("true"));
                         } else {
                             this.stack.add(0, new Bool("false"));
@@ -182,19 +182,19 @@ public class CSEMachine {
                 }
                 // rule no. 6 & 7
             } else if (node instanceof Rator) {
-                if (node instanceof Uop) {
+                if (node instanceof Unary) {
                     Node rator = node;
                     Node rand = this.stack.get(0);
                     this.stack.remove(0);
-                    stack.add(0, this.applyUnaryOperation(rator, rand));
+                    stack.add(0, this.unaryOperator(rator, rand));
                 }
-                if (node instanceof Bop) {
+                if (node instanceof Binary) {
                     Node rator = node;
                     Node rand1 = this.stack.get(0);
                     Node rand2 = this.stack.get(1);
                     this.stack.remove(0);
                     this.stack.remove(0);
-                    this.stack.add(0, this.applyBinaryOperation(rator, rand1, rand2));
+                    this.stack.add(0, this.binaryOperator(rator, rand1, rand2));
                 }
                 // rule no. 8
             } else if (node instanceof Beta) {
@@ -207,12 +207,12 @@ public class CSEMachine {
                 // rule no. 9
             } else if (node instanceof Tau) {
                 Tau tau = (Tau) node;
-                Tup tup = new Tup();
+                Tuple tuple = new Tuple();
                 for (int i = 0; i < tau.getN(); i++) {
-                    tup.nodes.add(this.stack.get(0));
+                    tuple.nodes.add(this.stack.get(0));
                     this.stack.remove(0);
                 }
-                this.stack.add(0, tup);
+                this.stack.add(0, tuple);
             } else if (node instanceof Delta) {
                 this.control.addAll(((Delta) node).nodes);
             } else if (node instanceof B) {
@@ -223,7 +223,7 @@ public class CSEMachine {
         }
     }
 
-    public Node applyUnaryOperation(Node rator, Node rand) {
+    public Node unaryOperator(Node rator, Node rand) {
         if ("neg".equals(rator.getValue())) {
             int val = Integer.parseInt(rand.getValue());
             return new Int(Integer.toString(-1 * val));
@@ -235,7 +235,7 @@ public class CSEMachine {
         }
     }
 
-    public Node applyBinaryOperation(Node rator, Node rand1, Node rand2) {
+    public Node binaryOperator(Node rator, Node rand1, Node rand2) {
         if ("+".equals(rator.getValue())) {
             int val1 = Integer.parseInt(rand1.getValue());
             int val2 = Integer.parseInt(rand2.getValue());
@@ -289,10 +289,10 @@ public class CSEMachine {
             int val2 = Integer.parseInt(rand2.getValue());
             return new Bool(Boolean.toString(val1 >= val2));
         } else if ("aug".equals(rator.getValue())) {
-            if (rand2 instanceof Tup) {
-                ((Tup) rand1).nodes.addAll(((Tup) rand2).nodes);
+            if (rand2 instanceof Tuple) {
+                ((Tuple) rand1).nodes.addAll(((Tuple) rand2).nodes);
             } else {
-                ((Tup) rand1).nodes.add(rand2);
+                ((Tuple) rand1).nodes.add(rand2);
             }
             return rand1;
         } else {
@@ -300,23 +300,10 @@ public class CSEMachine {
         }
     }
 
-    public String getTupleValue(Tup tup) {
-        String temp = "(";
-        for (Node Node : tup.nodes) {
-            if (Node instanceof Tup) {
-                temp = temp + this.getTupleValue((Tup) Node) + ", ";
-            } else {
-                temp = temp + Node.getValue() + ", ";
-            }
-        }
-        temp = temp.substring(0, temp.length() - 2) + ")";
-        return temp;
-    }
-
     public String evaluate() {
         this.run();
-        if (stack.get(0) instanceof Tup) {
-            return this.getTupleValue((Tup) stack.get(0));
+        if (stack.get(0) instanceof Tuple) {
+            return ((Tuple) stack.get(0)).getTuple();
         }
         return stack.get(0).getValue();
     }
@@ -326,7 +313,7 @@ public class CSEMachine {
             // unary operators
             case "not":
             case "neg":
-                return new Uop(node.getValue());
+                return new Unary(node.getValue());
             // binary operators
             case "+":
             case "-":
@@ -342,7 +329,7 @@ public class CSEMachine {
             case "gr":
             case "ge":
             case "aug":
-                return new Bop(node.getValue());
+                return new Binary(node.getValue());
             // gamma
             case "gamma":
                 return new Gamma();
@@ -361,7 +348,7 @@ public class CSEMachine {
                 } else if (node.getValue().startsWith("<STR:")) {
                     return new Str(node.getValue().substring(6, node.getValue().length() - 2));
                 } else if (node.getValue().startsWith("<nil")) {
-                    return new Tup();
+                    return new Tuple();
                 } else if (node.getValue().startsWith("<true>")) {
                     return new Bool("true");
                 } else if (node.getValue().startsWith("<false>")) {
@@ -379,6 +366,12 @@ public class CSEMachine {
         B b = new B();
         b.nodes = this.flatten(node);
         return b;
+    }
+
+    public Delta getDelta(Node node) {
+        Delta delta = new Delta(CSEMachine.j++);
+        delta.nodes = this.flatten(node);
+        return delta;
     }
 
     public Lambda getLambda(Node node) {
@@ -411,12 +404,6 @@ public class CSEMachine {
             }
         }
         return nodes;
-    }
-
-    public Delta getDelta(Node node) {
-        Delta delta = new Delta(CSEMachine.j++);
-        delta.nodes = this.flatten(node);
-        return delta;
     }
 
 }
