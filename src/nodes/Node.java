@@ -58,6 +58,60 @@ public class Node {
         return node;
     }
 
+    public Node generateNode() {
+        switch (this.getValue()) {
+            // unary operators
+            case "not":
+            case "neg":
+                return new Unary(this.getValue());
+            // binary operators
+            case "+":
+            case "-":
+            case "*":
+            case "/":
+            case "**":
+            case "&":
+            case "or":
+            case "eq":
+            case "ne":
+            case "ls":
+            case "le":
+            case "gr":
+            case "ge":
+            case "aug":
+                return new Binary(this.getValue());
+            // gamma
+            case "gamma":
+                return new Gamma();
+            // tau
+            case "tau":
+                return new Tau(this.children.size());
+            // ystar
+            case "ystar":
+                return new Ystar();
+            // operands <ID:>, <INT:>, <STR:>, <nil>, <true>, <false>, <dummy>
+            default:
+                if (this.getValue().startsWith("<ID:")) {
+                    return new Id(this.getValue().substring(4, this.getValue().length() - 1));
+                } else if (this.getValue().startsWith("<INT:")) {
+                    return new Int(this.getValue().substring(5, this.getValue().length() - 1));
+                } else if (this.getValue().startsWith("<STR:")) {
+                    return new Str(this.getValue().substring(6, this.getValue().length() - 2));
+                } else if (this.getValue().startsWith("<nil")) {
+                    return new Tuple();
+                } else if (this.getValue().startsWith("<true>")) {
+                    return new Bool("true");
+                } else if (this.getValue().startsWith("<false>")) {
+                    return new Bool("false");
+                } else if (this.getValue().startsWith("<dummy>")) {
+                    return new Dummy();
+                } else {
+                    System.out.println("Err node: " + this.getValue());
+                    return new Err();
+                }
+        }
+    }
+
     public void standardize() {
         if (!this.standardized) {
             for (Node child : this.children) {

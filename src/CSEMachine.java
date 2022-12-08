@@ -25,7 +25,7 @@ public class CSEMachine {
         this.env = env;
     }
 
-    public void run() {
+    public void build() {
         Environment currentEnv = this.env.get(0);
         int j = 1;
         while (!control.isEmpty()) {
@@ -224,71 +224,11 @@ public class CSEMachine {
     }
 
     public String evaluate() {
-        this.run();
+        this.build();
         if (stack.get(0) instanceof Tuple) {
             return ((Tuple) stack.get(0)).getTuple();
         }
         return stack.get(0).getValue();
-    }
-
-    public Node getNode(Node node) {
-        switch (node.getValue()) {
-            // unary operators
-            case "not":
-            case "neg":
-                return new Unary(node.getValue());
-            // binary operators
-            case "+":
-            case "-":
-            case "*":
-            case "/":
-            case "**":
-            case "&":
-            case "or":
-            case "eq":
-            case "ne":
-            case "ls":
-            case "le":
-            case "gr":
-            case "ge":
-            case "aug":
-                return new Binary(node.getValue());
-            // gamma
-            case "gamma":
-                return new Gamma();
-            // tau
-            case "tau":
-                return new Tau(node.children.size());
-            // ystar
-            case "ystar":
-                return new Ystar();
-            // operands <ID:>, <INT:>, <STR:>, <nil>, <true>, <false>, <dummy>
-            default:
-                if (node.getValue().startsWith("<ID:")) {
-                    return new Id(node.getValue().substring(4, node.getValue().length() - 1));
-                } else if (node.getValue().startsWith("<INT:")) {
-                    return new Int(node.getValue().substring(5, node.getValue().length() - 1));
-                } else if (node.getValue().startsWith("<STR:")) {
-                    return new Str(node.getValue().substring(6, node.getValue().length() - 2));
-                } else if (node.getValue().startsWith("<nil")) {
-                    return new Tuple();
-                } else if (node.getValue().startsWith("<true>")) {
-                    return new Bool("true");
-                } else if (node.getValue().startsWith("<false>")) {
-                    return new Bool("false");
-                } else if (node.getValue().startsWith("<dummy>")) {
-                    return new Dummy();
-                } else {
-                    System.out.println("Err node: " + node.getValue());
-                    return new Err();
-                }
-        }
-    }
-
-    public B getB(Node node) {
-        B b = new B();
-        b.nodes = this.flatten(node);
-        return b;
     }
 
     public Delta getDelta(Node node) {
@@ -319,9 +259,11 @@ public class CSEMachine {
             nodes.add(this.getDelta(node.children.get(1)));
             nodes.add(this.getDelta(node.children.get(2)));
             nodes.add(new Beta());
-            nodes.add(this.getB(node.children.get(0)));
+            B b = new B();
+            b.nodes = this.flatten(node.children.get(0));
+            nodes.add(b);
         } else {
-            nodes.add(this.getNode(node));
+            nodes.add(node.generateNode());
             for (Node child : node.children) {
                 nodes.addAll(this.flatten(child));
             }
