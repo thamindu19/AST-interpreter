@@ -144,13 +144,13 @@ public class CSEMachine {
                             this.stack.add(0, new Bool("false"));
                         }
                         this.stack.remove(1);
-                    } else if ("Isdummy".equals(nextNode.getValue())) {
-                        if (this.stack.get(0) instanceof Dummy) {
-                            this.stack.add(0, new Bool("true"));
-                        } else {
-                            this.stack.add(0, new Bool("false"));
-                        }
-                        this.stack.remove(1);
+                    // } else if ("Isdummy".equals(nextNode.getValue())) {
+                    //     if (this.stack.get(0) instanceof Dummy) {
+                    //         this.stack.add(0, new Bool("true"));
+                    //     } else {
+                    //         this.stack.add(0, new Bool("false"));
+                    //     }
+                    //     this.stack.remove(1);
                     } else if ("Istruthvalue".equals(nextNode.getValue())) {
                         if (this.stack.get(0) instanceof Bool) {
                             this.stack.add(0, new Bool("true"));

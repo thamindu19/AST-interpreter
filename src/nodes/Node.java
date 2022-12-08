@@ -103,8 +103,8 @@ public class Node {
                     return new Bool("true");
                 } else if (this.getValue().startsWith("<false>")) {
                     return new Bool("false");
-                } else if (this.getValue().startsWith("<dummy>")) {
-                    return new Dummy();
+                // } else if (this.getValue().startsWith("<dummy>")) {
+                //     return new Dummy();
                 } else {
                     System.out.println("Err node: " + this.getValue());
                     return new Err();
