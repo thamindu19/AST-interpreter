@@ -15,7 +15,7 @@ public class CSEMachine {
     public CSEMachine(AST ast) {
         ArrayList<Node> control = new ArrayList<Node>();
         control.add(CSEMachine.e0);
-        control.add(this.getDelta(ast.getRoot()));
+        control.add(this.generateDelta(ast.getRoot()));
         this.control = control;
         ArrayList<Node> stack = new ArrayList<Node>();
         stack.add(CSEMachine.e0);
@@ -224,15 +224,15 @@ public class CSEMachine {
         return stack.get(0).getValue();
     }
 
-    public Delta getDelta(Node node) {
+    public Delta generateDelta(Node node) {
         Delta delta = new Delta(CSEMachine.j++);
         delta.nodes = this.flatten(node);
         return delta;
     }
 
-    public Lambda getLambda(Node node) {
+    public Lambda generateLambda(Node node) {
         Lambda lambda = new Lambda(CSEMachine.i++);
-        lambda.setDelta(this.getDelta(node.children.get(1)));
+        lambda.setDelta(this.generateDelta(node.children.get(1)));
         if (",".equals(node.children.get(0).getValue())) {
             for (Node identifier : node.children.get(0).children) {
                 lambda.identifiers.add(new Id(identifier.getValue().substring(4, node.getValue().length() - 1)));
@@ -247,10 +247,10 @@ public class CSEMachine {
     private ArrayList<Node> flatten(Node node) {
         ArrayList<Node> nodes = new ArrayList<Node>();
         if ("lambda".equals(node.getValue())) {
-            nodes.add(this.getLambda(node));
+            nodes.add(this.generateLambda(node));
         } else if ("->".equals(node.getValue())) {
-            nodes.add(this.getDelta(node.children.get(1)));
-            nodes.add(this.getDelta(node.children.get(2)));
+            nodes.add(this.generateDelta(node.children.get(1)));
+            nodes.add(this.generateDelta(node.children.get(2)));
             nodes.add(new Beta());
             B b = new B();
             b.nodes = this.flatten(node.children.get(0));
