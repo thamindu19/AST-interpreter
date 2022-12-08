@@ -55,6 +55,6 @@ public class myrpal {
         CSEMachine machine = new CSEMachine(ast);
 
         // Output the answer
-        System.out.println(machine.output());
+        System.out.println(machine.evaluate());
     }
 }

@@ -7,7 +7,7 @@ import nodes.Node;
 public class CSEMachine {
     private ArrayList<Node> control;
     private ArrayList<Node> stack;
-    private ArrayList<E> environment;
+    private ArrayList<E> env;
     private static E e0 = new E(0);
     private static int i = 1;
     private static int j = 0;
@@ -20,28 +20,28 @@ public class CSEMachine {
         ArrayList<Node> stack = new ArrayList<Node>();
         stack.add(CSEMachine.e0);
         this.stack = stack;
-        ArrayList<E> environment = new ArrayList<E>();
-        environment.add(CSEMachine.e0);
-        this.environment = environment;
+        ArrayList<E> env = new ArrayList<E>();
+        env.add(CSEMachine.e0);
+        this.env = env;
     }
 
     public void run() {
-        E currentEnvironment = this.environment.get(0);
+        E currentEnv = this.env.get(0);
         int j = 1;
         while (!control.isEmpty()) {
             // pop last element of the control
-            Node currentNode = control.get(control.size() - 1);
+            Node node = control.get(control.size() - 1);
             control.remove(control.size() - 1);
             // rule no. 1
-            if (currentNode instanceof Id) {
-                this.stack.add(0, currentEnvironment.lookup((Id) currentNode));
+            if (node instanceof Id) {
+                this.stack.add(0, currentEnv.lookup((Id) node));
                 // rule no. 2
-            } else if (currentNode instanceof Lambda) {
-                Lambda lambda = (Lambda) currentNode;
-                lambda.setEnvironment(currentEnvironment.getIndex());
+            } else if (node instanceof Lambda) {
+                Lambda lambda = (Lambda) node;
+                lambda.setEnvironment(currentEnv.getIndex());
                 this.stack.add(0, lambda);
                 // rule no. 3, 4, 10, 11, 12 & 13
-            } else if (currentNode instanceof Gamma) {
+            } else if (node instanceof Gamma) {
                 Node nextNode = this.stack.get(0);
                 this.stack.remove(0);
                 // lambda (rule no. 4 & 11)
@@ -59,16 +59,16 @@ public class CSEMachine {
                             e.values.put(id, tup.nodes.get(i++));
                         }
                     }
-                    for (E environment : this.environment) {
-                        if (environment.getIndex() == lambda.getEnvironment()) {
-                            e.setParent(environment);
+                    for (E env : this.env) {
+                        if (env.getIndex() == lambda.getEnvironment()) {
+                            e.setParent(env);
                         }
                     }
-                    currentEnvironment = e;
+                    currentEnv = e;
                     this.control.add(e);
                     this.control.add(lambda.getDelta());
                     this.stack.add(0, e);
-                    this.environment.add(e);
+                    this.env.add(e);
                     // tup (rule no. 10)
                 } else if (nextNode instanceof Tup) {
                     Tup tup = (Tup) nextNode;
@@ -168,28 +168,28 @@ public class CSEMachine {
                     }
                 }
                 // rule no. 5
-            } else if (currentNode instanceof E) {
+            } else if (node instanceof E) {
                 this.stack.remove(1);
-                this.environment.get(((E) currentNode).getIndex()).setIsRemoved(true);
-                int y = this.environment.size();
+                this.env.get(((E) node).getIndex()).setIsRemoved(true);
+                int y = this.env.size();
                 while (y > 0) {
-                    if (!this.environment.get(y - 1).getIsRemoved()) {
-                        currentEnvironment = this.environment.get(y - 1);
+                    if (!this.env.get(y - 1).getIsRemoved()) {
+                        currentEnv = this.env.get(y - 1);
                         break;
                     } else {
                         y--;
                     }
                 }
                 // rule no. 6 & 7
-            } else if (currentNode instanceof Rator) {
-                if (currentNode instanceof Uop) {
-                    Node rator = currentNode;
+            } else if (node instanceof Rator) {
+                if (node instanceof Uop) {
+                    Node rator = node;
                     Node rand = this.stack.get(0);
                     this.stack.remove(0);
                     stack.add(0, this.applyUnaryOperation(rator, rand));
                 }
-                if (currentNode instanceof Bop) {
-                    Node rator = currentNode;
+                if (node instanceof Bop) {
+                    Node rator = node;
                     Node rand1 = this.stack.get(0);
                     Node rand2 = this.stack.get(1);
                     this.stack.remove(0);
@@ -197,7 +197,7 @@ public class CSEMachine {
                     this.stack.add(0, this.applyBinaryOperation(rator, rand1, rand2));
                 }
                 // rule no. 8
-            } else if (currentNode instanceof Beta) {
+            } else if (node instanceof Beta) {
                 if (Boolean.parseBoolean(this.stack.get(0).getValue())) {
                     this.control.remove(control.size() - 1);
                 } else {
@@ -205,20 +205,20 @@ public class CSEMachine {
                 }
                 this.stack.remove(0);
                 // rule no. 9
-            } else if (currentNode instanceof Tau) {
-                Tau tau = (Tau) currentNode;
+            } else if (node instanceof Tau) {
+                Tau tau = (Tau) node;
                 Tup tup = new Tup();
                 for (int i = 0; i < tau.getN(); i++) {
                     tup.nodes.add(this.stack.get(0));
                     this.stack.remove(0);
                 }
                 this.stack.add(0, tup);
-            } else if (currentNode instanceof Delta) {
-                this.control.addAll(((Delta) currentNode).nodes);
-            } else if (currentNode instanceof B) {
-                this.control.addAll(((B) currentNode).nodes);
+            } else if (node instanceof Delta) {
+                this.control.addAll(((Delta) node).nodes);
+            } else if (node instanceof B) {
+                this.control.addAll(((B) node).nodes);
             } else {
-                this.stack.add(0, currentNode);
+                this.stack.add(0, node);
             }
         }
     }
@@ -313,7 +313,7 @@ public class CSEMachine {
         return temp;
     }
 
-    public String output() {
+    public String evaluate() {
         this.run();
         if (stack.get(0) instanceof Tup) {
             return this.getTupleValue((Tup) stack.get(0));
@@ -377,7 +377,7 @@ public class CSEMachine {
 
     public B getB(Node node) {
         B b = new B();
-        b.nodes = this.getPreOrderTraverse(node);
+        b.nodes = this.flatten(node);
         return b;
     }
 
@@ -395,7 +395,7 @@ public class CSEMachine {
         return lambda;
     }
 
-    private ArrayList<Node> getPreOrderTraverse(Node node) {
+    private ArrayList<Node> flatten(Node node) {
         ArrayList<Node> nodes = new ArrayList<Node>();
         if ("lambda".equals(node.getValue())) {
             nodes.add(this.getLambda(node));
@@ -407,7 +407,7 @@ public class CSEMachine {
         } else {
             nodes.add(this.getNode(node));
             for (Node child : node.children) {
-                nodes.addAll(this.getPreOrderTraverse(child));
+                nodes.addAll(this.flatten(child));
             }
         }
         return nodes;
@@ -415,7 +415,7 @@ public class CSEMachine {
 
     public Delta getDelta(Node node) {
         Delta delta = new Delta(CSEMachine.j++);
-        delta.nodes = this.getPreOrderTraverse(node);
+        delta.nodes = this.flatten(node);
         return delta;
     }
 
