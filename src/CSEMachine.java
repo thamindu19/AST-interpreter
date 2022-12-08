@@ -29,22 +29,17 @@ public class CSEMachine {
         Environment currentEnv = this.env.get(0);
         int j = 1;
         while (!control.isEmpty()) {
-            // pop last element of the control
             Node node = control.get(control.size() - 1);
             control.remove(control.size() - 1);
-            // rule no. 1
             if (node instanceof Id) {
                 this.stack.add(0, currentEnv.lookup((Id) node));
-                // rule no. 2
             } else if (node instanceof Lambda) {
                 Lambda lambda = (Lambda) node;
                 lambda.setEnvironment(currentEnv.getIndex());
                 this.stack.add(0, lambda);
-                // rule no. 3, 4, 10, 11, 12 & 13
             } else if (node instanceof Gamma) {
                 Node nextNode = this.stack.get(0);
                 this.stack.remove(0);
-                // lambda (rule no. 4 & 11)
                 if (nextNode instanceof Lambda) {
                     Lambda lambda = (Lambda) nextNode;
                     Environment e = new Environment(j++);
@@ -69,13 +64,11 @@ public class CSEMachine {
                     this.control.add(lambda.getDelta());
                     this.stack.add(0, e);
                     this.env.add(e);
-                    // tup (rule no. 10)
                 } else if (nextNode instanceof Tuple) {
                     Tuple tuple = (Tuple) nextNode;
                     int i = Integer.parseInt(this.stack.get(0).getValue());
                     this.stack.remove(0);
                     this.stack.add(0, tuple.nodes.get(i - 1));
-                    // ystar (rule no. 12)
                 } else if (nextNode instanceof Ystar) {
                     Lambda lambda = (Lambda) this.stack.get(0);
                     this.stack.remove(0);
@@ -85,7 +78,6 @@ public class CSEMachine {
                     eta.setIdentifier(lambda.identifiers.get(0));
                     eta.setLambda(lambda);
                     this.stack.add(0, eta);
-                    // eta (rule no. 13)
                 } else if (nextNode instanceof Eta) {
                     Eta eta = (Eta) nextNode;
                     Lambda lambda = eta.getLambda();
@@ -93,10 +85,8 @@ public class CSEMachine {
                     this.control.add(new Gamma());
                     this.stack.add(0, eta);
                     this.stack.add(0, lambda);
-                    // builtin functions
                 } else {
                     if ("Print".equals(nextNode.getValue())) {
-                        // do nothing
                     } else if ("Stem".equals(nextNode.getValue())) {
                         Node s = this.stack.get(0);
                         this.stack.remove(0);
@@ -119,10 +109,6 @@ public class CSEMachine {
                         this.stack.remove(0);
                         Int n = new Int(Integer.toString(tuple.nodes.size()));
                         this.stack.add(0, n);
-                    } else if ("Null".equals(nextNode.getValue())) {
-                        // implement
-                    } else if ("Itos".equals(nextNode.getValue())) {
-                        // implement
                     } else if ("Isinteger".equals(nextNode.getValue())) {
                         if (this.stack.get(0) instanceof Int) {
                             this.stack.add(0, new Bool("true"));
@@ -160,7 +146,6 @@ public class CSEMachine {
                         this.stack.remove(1);
                     }
                 }
-                // rule no. 5
             } else if (node instanceof Environment) {
                 this.stack.remove(1);
                 this.env.get(((Environment) node).getIndex()).setIsRemoved(true);
@@ -173,7 +158,6 @@ public class CSEMachine {
                         y--;
                     }
                 }
-                // rule no. 6 & 7
             } else if (node instanceof Rator) {
                 if (node instanceof Unary) {
                     Unary rator = (Unary) node;
@@ -189,7 +173,6 @@ public class CSEMachine {
                     this.stack.remove(0);
                     this.stack.add(0, rator.operate(rand1, rand2));
                 }
-                // rule no. 8
             } else if (node instanceof Beta) {
                 if (Boolean.parseBoolean(this.stack.get(0).getValue())) {
                     this.control.remove(control.size() - 1);
@@ -197,7 +180,6 @@ public class CSEMachine {
                     this.control.remove(control.size() - 2);
                 }
                 this.stack.remove(0);
-                // rule no. 9
             } else if (node instanceof Tau) {
                 Tau tau = (Tau) node;
                 Tuple tuple = new Tuple();
