@@ -15,7 +15,7 @@ public class Unary extends Rator {
             boolean val = Boolean.parseBoolean(rand.getValue());
             return new Bool(Boolean.toString(!val));
         } else {
-            return new Err();
+            return new Invalid();
         }
     }
 

@@ -67,7 +67,7 @@ public class Binary extends Rator {
             }
             return rand1;
         } else {
-            return new Err();
+            return new Invalid();
         }
     }
 

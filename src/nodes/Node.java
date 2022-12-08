@@ -7,7 +7,7 @@ public class Node {
     private Node parent;
     public ArrayList<Node> children;
     private int depth;
-    public boolean standardized = false;
+    public boolean standardized;
 
     public Node(String value) {
         this.value = value;
@@ -92,7 +92,7 @@ public class Node {
                     return new Bool("false");
                 } else {
                     System.out.println("Err node: " + this.getValue());
-                    return new Err();
+                    return new Invalid();
                 }
         }
     }
