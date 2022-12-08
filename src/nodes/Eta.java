@@ -3,7 +3,6 @@ package nodes;
 public class Eta extends Node {
     private int index;
     private int environment;
-    private Id identifier;
     private Lambda lambda;
 
     public Eta() {
@@ -24,10 +23,6 @@ public class Eta extends Node {
 
     public int getEnvironment() {
         return this.environment;
-    }
-
-    public void setIdentifier(Id id) {
-        this.identifier = id;
     }
 
     public void setLambda(Lambda lambda) {
