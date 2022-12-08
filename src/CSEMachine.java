@@ -7,8 +7,8 @@ import nodes.Node;
 public class CSEMachine {
     private ArrayList<Node> control;
     private ArrayList<Node> stack;
-    private ArrayList<E> env;
-    private static E e0 = new E(0);
+    private ArrayList<Environment> env;
+    private static Environment e0 = new Environment(0);
     private static int i = 1;
     private static int j = 0;
 
@@ -20,13 +20,13 @@ public class CSEMachine {
         ArrayList<Node> stack = new ArrayList<Node>();
         stack.add(CSEMachine.e0);
         this.stack = stack;
-        ArrayList<E> env = new ArrayList<E>();
+        ArrayList<Environment> env = new ArrayList<Environment>();
         env.add(CSEMachine.e0);
         this.env = env;
     }
 
     public void run() {
-        E currentEnv = this.env.get(0);
+        Environment currentEnv = this.env.get(0);
         int j = 1;
         while (!control.isEmpty()) {
             // pop last element of the control
@@ -47,7 +47,7 @@ public class CSEMachine {
                 // lambda (rule no. 4 & 11)
                 if (nextNode instanceof Lambda) {
                     Lambda lambda = (Lambda) nextNode;
-                    E e = new E(j++);
+                    Environment e = new Environment(j++);
                     if (lambda.identifiers.size() == 1) {
                         e.values.put(lambda.identifiers.get(0), this.stack.get(0));
                         this.stack.remove(0);
@@ -59,7 +59,7 @@ public class CSEMachine {
                             e.values.put(id, tup.nodes.get(i++));
                         }
                     }
-                    for (E env : this.env) {
+                    for (Environment env : this.env) {
                         if (env.getIndex() == lambda.getEnvironment()) {
                             e.setParent(env);
                         }
@@ -168,9 +168,9 @@ public class CSEMachine {
                     }
                 }
                 // rule no. 5
-            } else if (node instanceof E) {
+            } else if (node instanceof Environment) {
                 this.stack.remove(1);
-                this.env.get(((E) node).getIndex()).setIsRemoved(true);
+                this.env.get(((Environment) node).getIndex()).setIsRemoved(true);
                 int y = this.env.size();
                 while (y > 0) {
                     if (!this.env.get(y - 1).getIsRemoved()) {

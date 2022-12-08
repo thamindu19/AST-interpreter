@@ -2,13 +2,13 @@ package nodes;
 
 import java.util.HashMap;
 
-public class E extends Node {
+public class Environment extends Node {
     private int index;
-    private E parent;
+    private Environment parent;
     private boolean isRemoved = false;
     public HashMap<Id, Node> values;
 
-    public E(int i) {
+    public Environment(int i) {
         super("e");
         this.setIndex(i);
         this.values = new HashMap<Id, Node>();
@@ -22,11 +22,11 @@ public class E extends Node {
         return this.index;
     }
 
-    public void setParent(E e) {
+    public void setParent(Environment e) {
         this.parent = e;
     }
 
-    public E getParent() {
+    public Environment getParent() {
         return this.parent;
     }
 
