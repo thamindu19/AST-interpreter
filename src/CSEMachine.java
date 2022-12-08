@@ -206,26 +206,6 @@ public class CSEMachine {
         return stack.get(0).getValue();
     }
 
-    public Delta generateDelta(Node node) {
-        Delta delta = new Delta(CSEMachine.j++);
-        delta.nodes = this.flatten(node);
-        return delta;
-    }
-
-    public Lambda generateLambda(Node node) {
-        Lambda lambda = new Lambda(CSEMachine.i++);
-        lambda.setDelta(this.generateDelta(node.children.get(1)));
-        if (",".equals(node.children.get(0).getValue())) {
-            for (Node identifier : node.children.get(0).children) {
-                lambda.identifiers.add(new Id(identifier.getValue().substring(4, node.getValue().length() - 1)));
-            }
-        } else {
-            lambda.identifiers.add(
-                    new Id(node.children.get(0).getValue().substring(4, node.children.get(0).getValue().length() - 1)));
-        }
-        return lambda;
-    }
-
     private ArrayList<Node> flatten(Node node) {
         ArrayList<Node> nodes = new ArrayList<Node>();
         if ("lambda".equals(node.getValue())) {
@@ -244,6 +224,26 @@ public class CSEMachine {
             }
         }
         return nodes;
+    }
+
+    public Delta generateDelta(Node node) {
+        Delta delta = new Delta(CSEMachine.j++);
+        delta.nodes = this.flatten(node);
+        return delta;
+    }
+
+    public Lambda generateLambda(Node node) {
+        Lambda lambda = new Lambda(CSEMachine.i++);
+        lambda.setDelta(this.generateDelta(node.children.get(1)));
+        if (",".equals(node.children.get(0).getValue())) {
+            for (Node identifier : node.children.get(0).children) {
+                lambda.identifiers.add(new Id(identifier.getValue().substring(4, node.getValue().length() - 1)));
+            }
+        } else {
+            lambda.identifiers.add(
+                    new Id(node.children.get(0).getValue().substring(4, node.children.get(0).getValue().length() - 1)));
+        }
+        return lambda;
     }
 
 }
