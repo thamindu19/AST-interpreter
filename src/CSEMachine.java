@@ -25,6 +25,9 @@ public class CSEMachine {
         this.env = env;
     }
 
+    /*
+     * Build the CSE machine for the AST
+     */
     public void build() {
         Environment currentEnv = this.env.get(0);
         int j = 1;
@@ -198,6 +201,9 @@ public class CSEMachine {
         }
     }
 
+    /*
+     * Evaluate the output of the program
+     */
     public String evaluate() {
         this.build();
         if (stack.get(0) instanceof Tuple) {
@@ -206,6 +212,9 @@ public class CSEMachine {
         return stack.get(0).getValue();
     }
 
+    /*
+     * Flatten the tree from node
+     */
     private ArrayList<Node> flatten(Node node) {
         ArrayList<Node> nodes = new ArrayList<Node>();
         if ("lambda".equals(node.getValue())) {
@@ -226,12 +235,18 @@ public class CSEMachine {
         return nodes;
     }
 
+    /*
+     * Generate a new delta node for node
+     */
     public Delta generateDelta(Node node) {
         Delta delta = new Delta(CSEMachine.j++);
         delta.nodes = this.flatten(node);
         return delta;
     }
 
+    /*
+     * Generate a new lambda node for node
+     */
     public Lambda generateLambda(Node node) {
         Lambda lambda = new Lambda(CSEMachine.i++);
         lambda.setDelta(this.generateDelta(node.children.get(1)));

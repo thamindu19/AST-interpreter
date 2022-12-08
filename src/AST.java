@@ -11,6 +11,9 @@ public class AST {
         return this.root;
     }
 
+    /*
+     * Call the standardize method in Node class on the root
+     */
     public void standardize() {
         this.root.standardize();
     }

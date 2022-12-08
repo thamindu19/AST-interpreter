@@ -41,6 +41,9 @@ public class Node {
         return children.size();
     }
 
+    /*
+     * Create a node
+     */
     public static Node create(String value, int depth, Node parent, ArrayList<Node> children,
             boolean standardized) {
         Node node = new Node(value);
@@ -51,6 +54,9 @@ public class Node {
         return node;
     }
 
+    /*
+     * Generate a subclass node according to the value of the node
+     */
     public Node generateNode() {
         switch (this.getValue()) {
             case "not":
@@ -97,6 +103,9 @@ public class Node {
         }
     }
 
+    /*
+     * Standardize the node
+     */
     public void standardize() {
         if (!this.standardized) {
             for (Node child : this.children) {
