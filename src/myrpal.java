@@ -21,7 +21,7 @@ public class myrpal {
 
         // Create root node
         int depth = 0;
-        Node root = Node.create(data.get(0), depth);
+        Node root = Node.create(data.get(0), depth, null, new ArrayList<Node>(), false);
 
         // Build the Abstract Syntax Tree
         AST ast = new AST(root);
@@ -33,7 +33,7 @@ public class myrpal {
                 i++;
                 d++;
             }
-            Node node = Node.create(s.substring(i), d);
+            Node node = Node.create(s.substring(i), d, null, new ArrayList<Node>(), false);
             if (depth < d) {
                 node.setParent(previousNode);
                 previousNode.children.add(node);
