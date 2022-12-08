@@ -10,8 +10,7 @@ public class myrpal {
     public static void main(String[] args) throws FileNotFoundException {
 
         // Get input data
-        // String fileName = args[0];
-        String fileName = "ast.txt";
+        String fileName = args[0];
         Scanner scanner = new Scanner(new File(fileName));
         ArrayList<String> data = new ArrayList<String>();
         while (scanner.hasNextLine()) {
