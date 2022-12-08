@@ -4,6 +4,7 @@ public class Eta extends Node {
     private int index;
     private int environment;
     private Lambda lambda;
+	private Id identifier;
 
     public Eta() {
         super("eta");
@@ -32,5 +33,10 @@ public class Eta extends Node {
     public Lambda getLambda() {
         return this.lambda;
     }
+
+	public void setIdentifier(Id id) {
+		this.identifier = id;
+		
+	}
 
 }
