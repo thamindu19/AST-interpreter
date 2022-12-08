@@ -183,18 +183,18 @@ public class CSEMachine {
                 // rule no. 6 & 7
             } else if (node instanceof Rator) {
                 if (node instanceof Unary) {
-                    Node rator = node;
-                    Node rand = this.stack.get(0);
+                    Unary rator = (Unary) node;
+                    Rand rand = (Rand) this.stack.get(0);
                     this.stack.remove(0);
-                    stack.add(0, this.unaryOperator(rator, rand));
+                    stack.add(0, rator.operate(rand));
                 }
                 if (node instanceof Binary) {
-                    Node rator = node;
-                    Node rand1 = this.stack.get(0);
-                    Node rand2 = this.stack.get(1);
+                    Binary rator = (Binary) node;
+                    Rand rand1 = (Rand) this.stack.get(0);
+                    Rand rand2 = (Rand) this.stack.get(1);
                     this.stack.remove(0);
                     this.stack.remove(0);
-                    this.stack.add(0, this.binaryOperator(rator, rand1, rand2));
+                    this.stack.add(0, rator.operate(rand1, rand2));
                 }
                 // rule no. 8
             } else if (node instanceof Beta) {
@@ -220,83 +220,6 @@ public class CSEMachine {
             } else {
                 this.stack.add(0, node);
             }
-        }
-    }
-
-    public Node unaryOperator(Node rator, Node rand) {
-        if ("neg".equals(rator.getValue())) {
-            int val = Integer.parseInt(rand.getValue());
-            return new Int(Integer.toString(-1 * val));
-        } else if ("not".equals(rator.getValue())) {
-            boolean val = Boolean.parseBoolean(rand.getValue());
-            return new Bool(Boolean.toString(!val));
-        } else {
-            return new Err();
-        }
-    }
-
-    public Node binaryOperator(Node rator, Node rand1, Node rand2) {
-        if ("+".equals(rator.getValue())) {
-            int val1 = Integer.parseInt(rand1.getValue());
-            int val2 = Integer.parseInt(rand2.getValue());
-            return new Int(Integer.toString(val1 + val2));
-        } else if ("-".equals(rator.getValue())) {
-            int val1 = Integer.parseInt(rand1.getValue());
-            int val2 = Integer.parseInt(rand2.getValue());
-            return new Int(Integer.toString(val1 - val2));
-        } else if ("*".equals(rator.getValue())) {
-            int val1 = Integer.parseInt(rand1.getValue());
-            int val2 = Integer.parseInt(rand2.getValue());
-            return new Int(Integer.toString(val1 * val2));
-        } else if ("/".equals(rator.getValue())) {
-            int val1 = Integer.parseInt(rand1.getValue());
-            int val2 = Integer.parseInt(rand2.getValue());
-            return new Int(Integer.toString(val1 / val2));
-        } else if ("**".equals(rator.getValue())) {
-            int val1 = Integer.parseInt(rand1.getValue());
-            int val2 = Integer.parseInt(rand2.getValue());
-            return new Int(Integer.toString((int) Math.pow(val1, val2)));
-        } else if ("&".equals(rator.getValue())) {
-            boolean val1 = Boolean.parseBoolean(rand1.getValue());
-            boolean val2 = Boolean.parseBoolean(rand2.getValue());
-            return new Bool(Boolean.toString(val1 && val2));
-        } else if ("or".equals(rator.getValue())) {
-            boolean val1 = Boolean.parseBoolean(rand1.getValue());
-            boolean val2 = Boolean.parseBoolean(rand2.getValue());
-            return new Bool(Boolean.toString(val1 || val2));
-        } else if ("eq".equals(rator.getValue())) {
-            String val1 = rand1.getValue();
-            String val2 = rand2.getValue();
-            return new Bool(Boolean.toString(val1.equals(val2)));
-        } else if ("ne".equals(rator.getValue())) {
-            String val1 = rand1.getValue();
-            String val2 = rand2.getValue();
-            return new Bool(Boolean.toString(!val1.equals(val2)));
-        } else if ("ls".equals(rator.getValue())) {
-            int val1 = Integer.parseInt(rand1.getValue());
-            int val2 = Integer.parseInt(rand2.getValue());
-            return new Bool(Boolean.toString(val1 < val2));
-        } else if ("le".equals(rator.getValue())) {
-            int val1 = Integer.parseInt(rand1.getValue());
-            int val2 = Integer.parseInt(rand2.getValue());
-            return new Bool(Boolean.toString(val1 <= val2));
-        } else if ("gr".equals(rator.getValue())) {
-            int val1 = Integer.parseInt(rand1.getValue());
-            int val2 = Integer.parseInt(rand2.getValue());
-            return new Bool(Boolean.toString(val1 > val2));
-        } else if ("ge".equals(rator.getValue())) {
-            int val1 = Integer.parseInt(rand1.getValue());
-            int val2 = Integer.parseInt(rand2.getValue());
-            return new Bool(Boolean.toString(val1 >= val2));
-        } else if ("aug".equals(rator.getValue())) {
-            if (rand2 instanceof Tuple) {
-                ((Tuple) rand1).nodes.addAll(((Tuple) rand2).nodes);
-            } else {
-                ((Tuple) rand1).nodes.add(rand2);
-            }
-            return rand1;
-        } else {
-            return new Err();
         }
     }
 
