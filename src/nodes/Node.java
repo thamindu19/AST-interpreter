@@ -60,11 +60,9 @@ public class Node {
 
     public Node generateNode() {
         switch (this.getValue()) {
-            // unary operators
             case "not":
             case "neg":
                 return new Unary(this.getValue());
-            // binary operators
             case "+":
             case "-":
             case "*":
@@ -80,16 +78,12 @@ public class Node {
             case "ge":
             case "aug":
                 return new Binary(this.getValue());
-            // gamma
             case "gamma":
                 return new Gamma();
-            // tau
             case "tau":
                 return new Tau(this.children.size());
-            // ystar
             case "ystar":
                 return new Ystar();
-            // operands <ID:>, <INT:>, <STR:>, <nil>, <true>, <false>, <dummy>
             default:
                 if (this.getValue().startsWith("<ID:")) {
                     return new Id(this.getValue().substring(4, this.getValue().length() - 1));
@@ -103,8 +97,6 @@ public class Node {
                     return new Bool("true");
                 } else if (this.getValue().startsWith("<false>")) {
                     return new Bool("false");
-                // } else if (this.getValue().startsWith("<dummy>")) {
-                //     return new Dummy();
                 } else {
                     System.out.println("Err node: " + this.getValue());
                     return new Err();
